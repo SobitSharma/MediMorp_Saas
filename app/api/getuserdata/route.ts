@@ -4,7 +4,7 @@ import { auth } from "@clerk/nextjs/server";
 import { dbConnect } from "@/Utility/db/dbConnect";
 import { Media } from "@/Utility/Models/Media.model";
 
-export async function GET(request:Request){
+export async function GET(){
     try {
         const {userId} = auth()
         if(!userId){

@@ -37,7 +37,7 @@ export async function POST(request:Request){
         if(mediaThatNeedsToBeTransformed.mediaType == "video"){
             return NextResponse.json({status:400, message:"Sorry Right Now The Transformation is Available only for Images"})
         }
-        let mediaType = mediaThatNeedsToBeTransformed.mediaType
+        const mediaType = mediaThatNeedsToBeTransformed.mediaType
         let transformedMedia;
         if(tranformId == 'round-corners'){
             if(mediaType == 'image'){
@@ -111,7 +111,7 @@ export async function POST(request:Request){
             }
         }
 
-        let newMedia = new Media({
+        const newMedia = new Media({
             publicId: transformedMedia.public_id,
             mediaType:transformedMedia.resource_type,
             originalUrl:transformedMedia.eager[0]?.secure_url,

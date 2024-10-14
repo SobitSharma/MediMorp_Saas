@@ -3,7 +3,7 @@ import { dbConnect } from "@/Utility/db/dbConnect";
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
-export async function POST(request: Request) {
+export async function POST() {
     try {
         const { userId } = auth();
         if (!userId) {

@@ -43,6 +43,7 @@ const UploadComponent: React.FC = () => {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
     } catch (err) {
+      console.log(err)
       toast.error("An error occurred while saving the media.");
     } finally {
       setIsLoading(false);
