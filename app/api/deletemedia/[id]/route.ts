@@ -51,8 +51,12 @@ export async function DELETE(request: Request, { params }: { params: { id: strin
         }
 
         return NextResponse.json({ message: "Media Deleted Successfully" });
-    } catch (error: any) {
-        console.error(`Error occurred in deleting the Media: ${error.message}`);
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            console.log(`Error in saving User: ${error.message}`);
+        } else {
+            console.log('An unknown error occurred');
+        }
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }

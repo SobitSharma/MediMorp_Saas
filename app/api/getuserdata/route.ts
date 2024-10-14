@@ -19,8 +19,12 @@ export async function GET(request:Request){
             model:Media
         })
         return NextResponse.json({status:200, message:"Sucess", data:currentUser})
-    } catch (error:any) {
-        console.log(error.message)
-        return NextResponse.json({error:error.message})
+    } catch (error:unknown) {
+        if (error instanceof Error) {
+            console.log(`Error in saving User: ${error.message}`);
+        } else {
+            console.log('An unknown error occurred');
+        }
+        return NextResponse.json({error:"Some Error Occurred"})
     }
 }

@@ -109,8 +109,12 @@ export async function POST(request: Request) {
             media: creatingNewMedia
         });
 
-    } catch (error: any) {
-        console.error(`Error occurred in uploading media:`, error.message);
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            console.log(`Error in saving User: ${error.message}`);
+        } else {
+            console.log('An unknown error occurred');
+        }
         return NextResponse.json(
             { error: 'Internal server error occurred' },
             { status: 500 }

@@ -26,7 +26,6 @@ const HomePage = () => {
       if(!savedUserId){
         userId = user?.id
         saveUserId(userId);
-        console.log(userId)
       }
 
       if(isUserSavedInDataBase) return

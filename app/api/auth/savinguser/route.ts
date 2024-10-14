@@ -3,29 +3,33 @@ import { dbConnect } from "@/Utility/db/dbConnect";
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
-export async function POST(request:Request){
+export async function POST(request: Request) {
     try {
-        const {userId} = auth()
-        if(!userId){
-            return NextResponse.json({error:"Invalid User"})
+        const { userId } = auth();
+        if (!userId) {
+            return NextResponse.json({ error: "Invalid User" });
         }
+        
         const dbConnectionStatus = await dbConnect();
-        if(!dbConnectionStatus.status){
-            return NextResponse.json({status:501, message:'Some Internal Error has Occurred'})
+        if (!dbConnectionStatus.status) {
+            return NextResponse.json({ status: 501, message: 'Some Internal Error has Occurred' });
         }
-        let newUser;
-        newUser = await User.findOne({userId:userId});
-        if(!newUser){
+        
+        let newUser = await User.findOne({ userId: userId });
+        if (!newUser) {
             newUser = new User({
-                userId:userId
-            })
-            await newUser.save()   
+                userId: userId
+            });
+            await newUser.save();
         }
-        return NextResponse.json({status:200, message:"User Auth is Done SuccessFully"})
-    } catch (error:any) {
-        console.log(`Error in saving User ${error.message}`)
-        return NextResponse.json({status:500, message:"Internal Error Occured"})
+        
+        return NextResponse.json({ status: 200, message: "User Auth is Done Successfully" });
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            console.log(`Error in saving User: ${error.message}`);
+        } else {
+            console.log('An unknown error occurred');
+        }
+        return NextResponse.json({ status: 500, message: "Internal Error Occurred" });
     }
 }
-
-

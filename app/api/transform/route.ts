@@ -137,8 +137,12 @@ export async function POST(request:Request){
 
         await Promise.all([currentUser.save(), newMedia.save()])
         return NextResponse.json({message:"The Media Has been tranformed You can see that in your Media tab", status:200})
-    } catch (error:any) {
-        console.log('Error Occurred in Tranforming API', error.message)
+    } catch (error:unknown) {
+        if (error instanceof Error) {
+            console.log(`Error in saving User: ${error.message}`);
+        } else {
+            console.log('An unknown error occurred');
+        }
         return NextResponse.json({status:501, message:"Some Error Occurred"})
     }
 

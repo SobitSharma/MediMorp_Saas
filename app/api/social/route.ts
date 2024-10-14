@@ -119,8 +119,12 @@ export async function POST(request: Request) {
         await Promise.all([currentUser.save(), createNewMedia.save()]);
 
         return NextResponse.json({ status: 200, message: 'Success', mediaId: createNewMedia._id });
-    } catch (error: any) {
-        console.error(error.message);
+    } catch (error:unknown) {
+        if (error instanceof Error) {
+            console.log(`Error in saving User: ${error.message}`);
+        } else {
+            console.log('An unknown error occurred');
+        }
         return NextResponse.json({ status: 500, message: 'Internal server error' });
     }
 }
