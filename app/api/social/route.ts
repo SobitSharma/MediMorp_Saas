@@ -130,7 +130,7 @@ export async function POST(request: Request) {
         if (error instanceof Error) {
             console.log(`Error in saving User: ${error.message}`);
         } else {
-            console.log('An unknown error occurred');
+            console.log('An unknown error has occurred');
         }
         return NextResponse.json({ status: 500, message: 'Internal server error' });
     }
