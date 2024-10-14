@@ -1,7 +1,8 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Copy, Trash2 } from "lucide-react";
 import useStore from "@/Utility/Store/Store";
+import Image from 'next/image'; // Importing Next.js Image component
 
 interface Dimensions {
   width: number;
@@ -35,21 +36,24 @@ const ImageUploadComponent = () => {
   const [fullscreenMedia, setFullscreenMedia] = useState<MediaItem | null>(null);
   const [showMedia, setShowMedia] = useState(0);
 
+  // Memoize mediaArray to avoid unnecessary re-renders
+  const memoizedMediaArray = useMemo(() => mediaArray, [mediaArray]);
+
   useEffect(() => {
-    setTempMediaArray(mediaArray);
-  }, [mediaArray]);
+    setTempMediaArray(memoizedMediaArray);
+  }, [memoizedMediaArray]);
 
   useEffect(() => {
     if (showMedia === 0) {
-      setTempMediaArray(mediaArray);
+      setTempMediaArray(memoizedMediaArray);
     } else if (showMedia === 1) {
-      const tempArray = mediaArray.filter((item: MediaItem) => item.mediaId.mediaType !== "video");
+      const tempArray = memoizedMediaArray.filter((item: MediaItem) => item.mediaId.mediaType !== "video");
       setTempMediaArray(tempArray);
     } else {
-      const tempArray = mediaArray.filter((item: MediaItem) => item.mediaId.mediaType === "video");
+      const tempArray = memoizedMediaArray.filter((item: MediaItem) => item.mediaId.mediaType === "video");
       setTempMediaArray(tempArray);
     }
-  }, [showMedia, mediaArray]);
+  }, [showMedia, memoizedMediaArray]);
 
   const handleFullscreen = (item: MediaItem) => {
     setFullscreenMedia(item);
@@ -125,8 +129,12 @@ const ImageUploadComponent = () => {
       link.click();
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
-    } catch (error: any) {
-      console.error("Download error:", error.message);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error("Download error:", error.message);
+      } else {
+        console.error("Download error:", error);
+      }
       throw error;
     }
   };
@@ -135,14 +143,6 @@ const ImageUploadComponent = () => {
     fetchUserData();
     setInitialLoading(false);
   }, []);
-
-  const formatFileSize = (bytes: number): string => {
-    if (bytes === 0) return "0 Bytes";
-    const k = 1024;
-    const sizes = ["Bytes", "KB", "MB", "GB"];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
-  };
 
   const copyId = async (id: string) => {
     await navigator.clipboard.writeText(id);
@@ -225,78 +225,63 @@ const ImageUploadComponent = () => {
                       className="relative pt-[56.25%] cursor-pointer group"
                       onDoubleClick={() => handleFullscreen(item)}
                     >
-                      {item.mediaId.mediaType === "video" ? (
-                        <video
-                          className="absolute top-0 left-0 w-full h-full object-cover"
-                          src={item.mediaId.originalUrl}
-                          controls
-                        />
-                      ) : (
-                        <img
-                          src={item.mediaId.originalUrl}
-                          alt={item.mediaId.fileName}
-                          className="absolute top-0 left-0 w-full h-full object-cover"
-                        />
-                      )}
-                      <div className="absolute top-0 left-0 w-full h-full bg-black bg-opacity-40 flex flex-col justify-center items-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                        <div className="flex flex-col items-center gap-2">
-                          <button className="btn btn-accent" onClick={() => downloadTheMedia(item.mediaId.originalUrl, item.mediaId.fileName)}>
-                            Download
-                          </button>
-                          <button
-                            className="btn btn-secondary"
-                            onClick={() => copyId(item.mediaId._id)}
-                          >
-                            {copiedId === item.mediaId._id ? "Copied!" : <Copy />}
-                          </button>
-                          <button
-                            className="btn btn-error"
-                            onClick={() => handleDelete(item._id)}
-                            disabled={deletingItems.has(item._id)}
-                          >
-                            {deletingItems.has(item._id) ? (
-                              <span className="loading loading-spinner loading-xs"></span>
-                            ) : (
-                              <Trash2 />
-                            )}
-                          </button>
-                        </div>
-                      </div>
+                      <Image
+                        src={item.mediaId.originalUrl}
+                        alt={item.mediaId.fileName}
+                        layout="fill"
+                        objectFit="cover"
+                        className="absolute top-0 left-0 w-full h-full rounded-lg"
+                      />
                     </figure>
+                    <div className="card-body">
+                      <h2 className="card-title text-base">{item.mediaId.fileName}</h2>
+                      <p>{item.mediaId.mediaType === "video" ? "Video" : "Image"}</p>
+                      <div className="card-actions justify-between">
+                        <button
+                          className="btn btn-sm btn-primary"
+                          onClick={() => downloadTheMedia(item.mediaId.originalUrl, item.mediaId.fileName)}
+                        >
+                          Download
+                        </button>
+                        <button
+                          className={`btn btn-sm btn-secondary ${deletingItems.has(item._id) ? "loading" : ""}`}
+                          onClick={() => handleDelete(item._id)}
+                        >
+                          <Trash2 className="mr-2" />
+                        </button>
+                        <button
+                          className={`btn btn-sm ${copiedId === item._id ? "btn-active" : ""}`}
+                          onClick={() => copyId(item._id)}
+                        >
+                          <Copy className="mr-2" />
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="text-white text-center">No media found!</div>
+              <div className="flex justify-center items-center min-h-[800px] text-white">
+                <h1>No Media Found</h1>
+              </div>
             )}
           </div>
-
-          {/* Fullscreen Modal */}
-          {fullscreenMedia && (
-            <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-75 z-50">
-              <div className="relative">
-                <button
-                  className="absolute top-2 right-2 btn btn-circle btn-error"
-                  onClick={handleCloseFullscreen}
-                >
-                  ✕
-                </button>
-                {fullscreenMedia.mediaId.mediaType === "video" ? (
-                  <video
-                    className="w-full max-w-[80vw] max-h-[80vh]"
-                    src={fullscreenMedia.mediaId.originalUrl}
-                    controls
-                  />
-                ) : (
-                  <img
-                    src={fullscreenMedia.mediaId.originalUrl}
-                    alt={fullscreenMedia.mediaId.fileName}
-                    className="w-full max-w-[80vw] max-h-[80vh] object-cover"
-                  />
-                )}
-              </div>
-            </div>
-          )}
+        </div>
+      )}
+      {fullscreenMedia && (
+        <div className="fixed inset-0 z-50 flex justify-center items-center bg-black bg-opacity-80">
+          <div className="relative">
+            <button className="absolute top-0 right-0 p-4 text-white" onClick={handleCloseFullscreen}>
+              X
+            </button>
+            <Image
+              src={fullscreenMedia.mediaId.originalUrl}
+              alt={fullscreenMedia.mediaId.fileName}
+              width={fullscreenMedia.mediaId.dimensions?.width || 800}
+              height={fullscreenMedia.mediaId.dimensions?.height || 600}
+              className="rounded-lg"
+            />
+          </div>
         </div>
       )}
     </div>

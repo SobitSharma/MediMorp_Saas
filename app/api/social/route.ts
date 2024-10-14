@@ -25,6 +25,13 @@ interface CloudinaryUploadResult {
     duration?: number;
 }
 
+interface TransformationOptions {
+    gravity?: string;
+    width?: number;
+    height?: number;
+    crop?: string;
+}
+
 export async function POST(request: Request) {
     try {
         const { userId } = auth();
@@ -46,7 +53,7 @@ export async function POST(request: Request) {
         const arrayBuffer = await file.arrayBuffer();
         const buffer = Buffer.from(arrayBuffer);
 
-        let transformationOptions: Record<string, any> = {};
+        let transformationOptions: TransformationOptions = {};
 
         switch (option) {
             case 'portrait':
@@ -119,7 +126,7 @@ export async function POST(request: Request) {
         await Promise.all([currentUser.save(), createNewMedia.save()]);
 
         return NextResponse.json({ status: 200, message: 'Success', mediaId: createNewMedia._id });
-    } catch (error:unknown) {
+    } catch (error: unknown) {
         if (error instanceof Error) {
             console.log(`Error in saving User: ${error.message}`);
         } else {
