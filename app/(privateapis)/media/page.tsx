@@ -245,13 +245,13 @@ const ImageUploadComponent = () => {
                         </button>
                         <button
                           className={`btn btn-sm btn-secondary ${deletingItems.has(item._id) ? "loading" : ""}`}
-                          onClick={() => handleDelete(item._id)}
+                          onClick={() => handleDelete(item.mediaId._id)}
                         >
                           <Trash2 className="mr-2" />
                         </button>
                         <button
                           className={`btn btn-sm ${copiedId === item._id ? "btn-active" : ""}`}
-                          onClick={() => copyId(item._id)}
+                          onClick={() => copyId(item.mediaId._id)}
                         >
                           <Copy className="mr-2" />
                         </button>
