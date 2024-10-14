@@ -81,7 +81,6 @@ const ImageUploadComponent = () => {
           body: formData,
         }
       );
-      const result = await response.json();
       fetchUserData();
     } catch (error) {
       console.error("Upload error:", error);
@@ -148,7 +147,7 @@ const ImageUploadComponent = () => {
   useEffect(() => {
     fetchUserData();
     setinitialLoading(false)
-  }, []);
+  });
 
   const formatFileSize = (bytes: number): string => {
     if (bytes === 0) return "0 Bytes";
@@ -161,7 +160,7 @@ const ImageUploadComponent = () => {
   const copyId = async (id: string) => {
     await navigator.clipboard.writeText(id);
     setCopiedId(id);
-    setTimeout(() => setCopiedId(""), 2000);
+    setTimeout(() => setCopiedId(""), 3000);
   };
 
   return (

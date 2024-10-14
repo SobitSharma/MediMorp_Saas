@@ -18,7 +18,7 @@ const HomePage = () => {
     if (getItem) {
       updateUserLoggedInStatus(); 
     }
-  }, []);
+  });
 
   useEffect(() => {
     const saveUserData = async () => {
@@ -37,7 +37,6 @@ const HomePage = () => {
           },
           body: JSON.stringify({ userId }),
         });
-        const result = await response.json()
         if (response.ok) {
           localStorage.setItem(`${process.env.SAAS_PLATFORM_USER}`, 'true'); // Store in localStorage
           updateUserLoggedInStatus(); // Update Zustand state // Save userId in Zustand store

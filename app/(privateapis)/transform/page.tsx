@@ -8,7 +8,6 @@ export default function TransformationCenter() {
   const [showMessage, setShowMessage] = useState('');
 
   const handleTransform = async() => {
-    console.log(mediaId, selectedOption)
     setIsLoading(true);
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/transform`, {
       method:'POST',
