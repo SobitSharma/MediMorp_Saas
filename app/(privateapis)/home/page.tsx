@@ -5,9 +5,18 @@ import Link from 'next/link';
 import { useUser } from '@clerk/nextjs';
 import useStore from '@/Utility/Store/Store';
 
+interface useStore {
+  isUserLoggedIn:boolean;
+  userId:string;
+  userMediaData:[],
+  updateUserLoggedInStatus:Function;
+  updateUserMediaData:Function;
+  updateUserId:Function;
+}
+
 const HomePage = () => {
   const { isLoaded, user } = useUser(); 
-  const saveUserId = useStore((state: any) => state.updateUserId);
+  const saveUserId = useStore((state:any) => state.updateUserId);
   const isUserSavedInDataBase = useStore((state: any) => state.isUserLoggedIn);
   const updateUserLoggedInStatus = useStore((state: any) => state.updateUserLoggedInStatus);
   const savedUserId = useStore((state:any)=>state.userId)
