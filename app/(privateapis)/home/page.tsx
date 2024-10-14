@@ -5,39 +5,30 @@ import Link from 'next/link';
 import { useUser } from '@clerk/nextjs';
 import useStore from '@/Utility/Store/Store';
 
-interface useStore {
-  isUserLoggedIn:boolean;
-  userId:string;
-  userMediaData:[],
-  updateUserLoggedInStatus:Function;
-  updateUserMediaData:Function;
-  updateUserId:Function;
-}
+const HomePage: React.FC = () => {
+  const { isLoaded, user } = useUser();
+  const updateUserId = useStore((state) => state.updateUserId);
+  const isUserLoggedIn = useStore((state) => state.isUserLoggedIn);
+  const updateUserLoggedInStatus = useStore((state) => state.updateUserLoggedInStatus);
+  const savedUserId = useStore((state) => state.userId);
 
-const HomePage = () => {
-  const { isLoaded, user } = useUser(); 
-  const saveUserId = useStore((state:any) => state.updateUserId);
-  const isUserSavedInDataBase = useStore((state: any) => state.isUserLoggedIn);
-  const updateUserLoggedInStatus = useStore((state: any) => state.updateUserLoggedInStatus);
-  const savedUserId = useStore((state:any)=>state.userId)
-  
   useEffect(() => {
-    if(isUserSavedInDataBase) return 
+    if (isUserLoggedIn) return;
     const getItem = localStorage.getItem(`${process.env.SAAS_PLATFORM_USER}`);
     if (getItem) {
-      updateUserLoggedInStatus(); 
+      updateUserLoggedInStatus();
     }
-  });
+  }, [isUserLoggedIn, updateUserLoggedInStatus]);
 
   useEffect(() => {
     const saveUserData = async () => {
-      let userId;
-      if(!savedUserId){
-        userId = user?.id
-        saveUserId(userId);
+      if (!isLoaded || isUserLoggedIn) return;
+
+      const userId = user?.id;
+      if (userId && !savedUserId) {
+        updateUserId(userId);
       }
 
-      if(isUserSavedInDataBase) return
       try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/savinguser`, {
           method: 'POST',
@@ -47,18 +38,16 @@ const HomePage = () => {
           body: JSON.stringify({ userId }),
         });
         if (response.ok) {
-          localStorage.setItem(`${process.env.SAAS_PLATFORM_USER}`, 'true'); // Store in localStorage
-          updateUserLoggedInStatus(); // Update Zustand state // Save userId in Zustand store
+          localStorage.setItem(`${process.env.SAAS_PLATFORM_USER}`, 'true');
+          updateUserLoggedInStatus();
         }
       } catch (error) {
         console.error('Error saving user:', error);
       }
     };
 
-    if (isLoaded) {
-      saveUserData(); // Call save user data when loaded
-    }
-  }, [isLoaded]); // Dependency on isLoaded and isUserSavedInDataBase
+    saveUserData();
+  }, [isLoaded, isUserLoggedIn, updateUserId, updateUserLoggedInStatus, user?.id, savedUserId]);
 
   return (
     <div className="container mx-auto px-4 py-8">

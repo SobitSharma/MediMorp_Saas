@@ -1,17 +1,26 @@
 import { create } from 'zustand';
 
-const useStore = create((set) => ({
+interface StoreState {
+  isUserLoggedIn: boolean;
+  userId: string;
+  userMediaData: any[]; // Consider replacing 'any' with a more specific type if possible
+  updateUserLoggedInStatus: () => void;
+  updateUserMediaData: (userdata: any[]) => void; // Consider replacing 'any' with a more specific type if possible
+  updateUserId: (userId: string) => void;
+}
+
+const useStore = create<StoreState>((set) => ({
   isUserLoggedIn: false,
-  userId: '', 
+  userId: '',
   userMediaData: [],
   updateUserLoggedInStatus: () =>
-    set((state: any) => ({ isUserLoggedIn: !state.isUserLoggedIn })),
-  updateUserMediaData: (userdata: any[]) =>
-    set((state: any) => ({
+    set((state) => ({ isUserLoggedIn: !state.isUserLoggedIn })),
+  updateUserMediaData: (userdata) =>
+    set(() => ({
       userMediaData: [...userdata],
     })),
-  updateUserId: (useridd: string) => 
-    set((state: any) => ({ userId: useridd })), 
+  updateUserId: (userId) =>
+    set(() => ({ userId })),
 }));
 
 export default useStore;

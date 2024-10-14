@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react';
-import { Image, Video, Share, Camera, FileImage, UserCircle, Settings } from 'lucide-react';
+import { Image,Share, Camera,UserCircle, Settings } from 'lucide-react';
 import { currentUser } from '@clerk/nextjs/server';
 import Link from 'next/link';
 import { SignOutButton } from '@clerk/nextjs';

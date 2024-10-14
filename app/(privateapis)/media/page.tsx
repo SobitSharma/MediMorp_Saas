@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { Upload, Copy, Video, Trash2, Image as ImageIcon } from "lucide-react";
+import {Copy,Trash2} from "lucide-react";
 import useStore from "@/Utility/Store/Store";
 
 interface Dimensions {
@@ -46,12 +46,12 @@ const ImageUploadComponent = () => {
       settempmediaArray(mediaArray);
     } else if (showmedia == 1) {
       let tempArray = mediaArray?.filter(
-        (item: any) => item.mediaId.mediaType !== "video"
+        (item: MediaItem) => item.mediaId.mediaType !== "video"
       );
       settempmediaArray(tempArray);
     } else {
       let tempArray = mediaArray?.filter(
-        (item: any) => item.mediaId.mediaType == "video"
+        (item: MediaItem) => item.mediaId.mediaType == "video"
       );
       settempmediaArray(tempArray);
     }
@@ -81,6 +81,7 @@ const ImageUploadComponent = () => {
           body: formData,
         }
       );
+      const result = await response.json();
       fetchUserData();
     } catch (error) {
       console.error("Upload error:", error);
@@ -147,7 +148,7 @@ const ImageUploadComponent = () => {
   useEffect(() => {
     fetchUserData();
     setinitialLoading(false)
-  });
+  }, []);
 
   const formatFileSize = (bytes: number): string => {
     if (bytes === 0) return "0 Bytes";
@@ -160,7 +161,7 @@ const ImageUploadComponent = () => {
   const copyId = async (id: string) => {
     await navigator.clipboard.writeText(id);
     setCopiedId(id);
-    setTimeout(() => setCopiedId(""), 3000);
+    setTimeout(() => setCopiedId(""), 2000);
   };
 
   return (
