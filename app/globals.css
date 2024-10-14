@@ -25,3 +25,12 @@ body {
     text-wrap: balance;
   }
 }
+
+@keyframes slideInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-slideInUp {
+  animation: slideInUp 1s ease-in-out;
+}
