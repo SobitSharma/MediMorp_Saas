@@ -155,7 +155,10 @@ const ImageUploadComponent = () => {
   return (
     <div className="min-h-screen bg-gray-900">
       {initialLoading ? 
-        <span className="loading loading-bars loading-lg"></span>
+        <div className="flex justify-center items-center min-h-screen">
+        <span className="loading loading-bars loading-2xl"></span>
+      </div>
+      
       : 
         <div className="w-full max-w-[2000px] mx-auto px-4 py-6">
           {/* Header Section with Filter */}
