@@ -28,7 +28,8 @@ export default function RootLayout({
   return (
     <ClerkProvider
     publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
-     
+    signInFallbackRedirectUrl={process.env.NEXT_PUBLIC_API_URL}
+    signUpFallbackRedirectUrl={process.env.NEXT_PUBLIC_API_URL}
     appearance={
       {
         baseTheme:dark,
