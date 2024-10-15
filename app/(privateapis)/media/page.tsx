@@ -87,7 +87,7 @@ const ImageUploadComponent = () => {
       );
       const respons = await response.json();
       if (respons.status == 200 && respons.media) {
-        let newArray = [respons.media, ...mediaArray];
+        const newArray = [respons.media, ...mediaArray];
         updateMediadata(newArray);
       }
     } catch (error) {

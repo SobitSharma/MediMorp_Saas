@@ -124,7 +124,7 @@ export async function POST(request: Request) {
         currentUser.media = [{ mediaId: newMedia._id, mediaType: 'image' }, ...currentUser.media];
 
         await Promise.all([currentUser.save(), newMedia.save()]);
-        let createdResponse = {
+        const createdResponse = {
             mediaId: {
               publicId: newMedia.publicId,
               mediaType: newMedia.mediaType,

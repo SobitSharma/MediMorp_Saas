@@ -136,7 +136,7 @@ export async function POST(request:Request){
         currentUser.totalStorage += newMedia.fileSize
 
         await Promise.all([currentUser.save(), newMedia.save()])
-        let createdResponse = {
+        const createdResponse = {
             mediaId: {
               publicId: newMedia.publicId,
               mediaType: newMedia.mediaType,
@@ -157,7 +157,7 @@ export async function POST(request:Request){
              status:200,
              media:createdResponse
         })
-        
+
     } catch (error:unknown) {
         if (error instanceof Error) {
             console.log(`Error in saving User: ${error.message}`);

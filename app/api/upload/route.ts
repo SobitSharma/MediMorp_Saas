@@ -97,7 +97,7 @@ export async function POST(request: Request) {
     currentUser.totalStorage += creatingNewMedia.fileSize;
 
     await Promise.all([creatingNewMedia.save(), currentUser.save()]);
-    let createdResponse = {
+    const createdResponse = {
       mediaId: {
         publicId: creatingNewMedia.publicId,
         mediaType: creatingNewMedia.mediaType,

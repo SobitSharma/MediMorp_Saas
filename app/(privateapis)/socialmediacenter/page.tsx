@@ -41,7 +41,7 @@ const UploadComponent: React.FC = () => {
       });
       const result = await response.json()
       if(result.status==200 && result.media){
-        let temparray = [result.media, ...mediaArray]
+        const temparray = [result.media, ...mediaArray]
         updateMediadata(temparray)
         toast.success("The media has been saved in the Media section.");
       }
