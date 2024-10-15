@@ -107,12 +107,15 @@ const ImageUploadComponent = () => {
 
   const fetchUserData = async () => {
     try {
+      setInitialLoading(true)
       const api = `${process.env.NEXT_PUBLIC_API_URL}/api/getuserdata`;
       const response = await fetch(api, { method: "GET" });
       const data = await response.json();
       updateMediadata(data.data?.media || []);
     } catch (error) {
       console.error("Error fetching user data:", error);
+    }finally{
+      setInitialLoading(false)
     }
   };
 
@@ -271,7 +274,7 @@ const ImageUploadComponent = () => {
       {fullscreenMedia && (
         <div className="fixed inset-0 z-50 flex justify-center items-center bg-black bg-opacity-80">
           <div className="relative">
-            <button className="absolute top-0 right-0 p-4 text-white" onClick={handleCloseFullscreen}>
+            <button className="absolute top-0 right-0 p-4 text-red-500 text-2xl" onClick={handleCloseFullscreen}>
               X
             </button>
             <Image
