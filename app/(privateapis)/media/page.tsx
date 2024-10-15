@@ -144,7 +144,6 @@ const ImageUploadComponent = () => {
 
   useEffect(() => {
     fetchUserData();
-    setInitialLoading(false);
   }, []);
 
   const copyId = async (id: string) => {
@@ -155,9 +154,9 @@ const ImageUploadComponent = () => {
 
   return (
     <div className="min-h-screen bg-gray-900">
-      {initialLoading ? (
+      {initialLoading ? 
         <span className="loading loading-bars loading-lg"></span>
-      ) : (
+      : 
         <div className="w-full max-w-[2000px] mx-auto px-4 py-6">
           {/* Header Section with Filter */}
           <div className="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
@@ -270,7 +269,7 @@ const ImageUploadComponent = () => {
             )}
           </div>
         </div>
-      )}
+      }
       {fullscreenMedia && (
         <div className="fixed inset-0 z-50 flex justify-center items-center bg-black bg-opacity-80">
           <div className="relative">
