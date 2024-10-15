@@ -11,7 +11,6 @@ export default function TransformationCenter() {
   const mediaArray = useStore((state) => state.userMediaData) || [];
 
   const handleTransform = async() => {
-    console.log(mediaId, selectedOption)
     setIsLoading(true);
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/transform`, {
       method:'POST',
@@ -22,7 +21,7 @@ export default function TransformationCenter() {
     });
     const result = await response.json();
     if(result.status==200 && result.media){
-      let temparray = [result.media, ...mediaArray]
+      const temparray = [result.media, ...mediaArray]
       updateMediadata(temparray)
     }
 

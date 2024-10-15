@@ -46,6 +46,7 @@ const HomePage: React.FC = () => {
           setApiCalled(true); // Set apiCalled to true after successful call
         }
       } catch (error) {
+        console.log(error)
         throw new Error("Some Problem Occurred While Saving User, Please Click Below Refresh")
       }
     };

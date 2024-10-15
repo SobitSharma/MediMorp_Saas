@@ -91,6 +91,7 @@ const ImageUploadComponent = () => {
         updateMediadata(newArray);
       }
     } catch (error) {
+      console.log(error)
       throw new Error(
         "UnExpected Error While Uploading Your Media, Please Refresh And Do it Again"
       );
@@ -112,12 +113,13 @@ const ImageUploadComponent = () => {
       );
       if (response.ok) {
         console.log("Deleted successfully");
-        let filteredData = mediaArray.filter(
+        const filteredData = mediaArray.filter(
           (item) => item.mediaId?._id !== mediaId
         );
         updateMediadata(filteredData);
       }
     } catch (error) {
+      console.log(error)
       throw new Error(
         "UnExpected Error While Deleting Your Media, Please Refresh And Do it Again"
       );
@@ -138,6 +140,7 @@ const ImageUploadComponent = () => {
       const data = await response.json();
       updateMediadata(data.data?.media || []);
     } catch (error) {
+      console.log(error)
       console.error("Error fetching user data:", error);
     } finally {
       setInitialLoading(false);
