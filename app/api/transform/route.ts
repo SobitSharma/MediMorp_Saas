@@ -136,7 +136,28 @@ export async function POST(request:Request){
         currentUser.totalStorage += newMedia.fileSize
 
         await Promise.all([currentUser.save(), newMedia.save()])
-        return NextResponse.json({message:"The Media Has been tranformed You can see that in your Media tab", status:200})
+        let createdResponse = {
+            mediaId: {
+              publicId: newMedia.publicId,
+              mediaType: newMedia.mediaType,
+              originalUrl: newMedia.originalUrl,
+              fileName: newMedia.fileName,
+              fileSize: newMedia.fileSize,
+              format: newMedia.format,
+              dimensions: newMedia.dimensions,
+              duration: newMedia.duration,
+              _id:newMedia._id
+            },
+            mediaType:newMedia.mediaType,
+            _id:Date.now()
+          };
+
+        return NextResponse.json({
+            message:"The Media Has been tranformed You can see that in your Media tab",
+             status:200,
+             media:createdResponse
+        })
+        
     } catch (error:unknown) {
         if (error instanceof Error) {
             console.log(`Error in saving User: ${error.message}`);

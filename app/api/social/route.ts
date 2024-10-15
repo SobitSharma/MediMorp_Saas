@@ -103,7 +103,7 @@ export async function POST(request: Request) {
             stream.end(buffer);
         });
 
-        const createNewMedia = new Media({
+        const newMedia = new Media({
             publicId: uploadResult.public_id,
             mediaType: uploadResult.resource_type,
             originalUrl: uploadResult.secure_url,
@@ -120,12 +120,27 @@ export async function POST(request: Request) {
             return NextResponse.json({ status: 404, message: 'User not found' });
         }
 
-        currentUser.totalStorage += createNewMedia.fileSize;
-        currentUser.media = [{ mediaId: createNewMedia._id, mediaType: 'image' }, ...currentUser.media];
+        currentUser.totalStorage += newMedia.fileSize;
+        currentUser.media = [{ mediaId: newMedia._id, mediaType: 'image' }, ...currentUser.media];
 
-        await Promise.all([currentUser.save(), createNewMedia.save()]);
+        await Promise.all([currentUser.save(), newMedia.save()]);
+        let createdResponse = {
+            mediaId: {
+              publicId: newMedia.publicId,
+              mediaType: newMedia.mediaType,
+              originalUrl: newMedia.originalUrl,
+              fileName: newMedia.fileName,
+              fileSize: newMedia.fileSize,
+              format: newMedia.format,
+              dimensions: newMedia.dimensions,
+              duration: newMedia.duration,
+              _id:newMedia._id
+            },
+            mediaType:newMedia.mediaType,
+            _id:Date.now()
+          };
 
-        return NextResponse.json({ status: 200, message: 'Success', mediaId: createNewMedia._id });
+        return NextResponse.json({ status: 200, message: 'Success', media : createdResponse});
     } catch (error: unknown) {
         if (error instanceof Error) {
             console.log(`Error in saving User: ${error.message}`);

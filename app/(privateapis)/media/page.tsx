@@ -2,7 +2,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { Copy, Trash2 } from "lucide-react";
 import useStore from "@/Utility/Store/Store";
-import Image from 'next/image'; // Importing Next.js Image component
+import Image from "next/image"; // Importing Next.js Image component
 
 interface Dimensions {
   width: number;
@@ -27,13 +27,15 @@ interface MediaItem {
 
 const ImageUploadComponent = () => {
   const [isUploading, setIsUploading] = useState(false);
-  const [initialLoading, setInitialLoading] = useState(true);
+  const [initialLoading, setInitialLoading] = useState(false);
   const [deletingItems, setDeletingItems] = useState<Set<string>>(new Set());
   const [copiedId, setCopiedId] = useState("");
   const updateMediadata = useStore((state) => state.updateUserMediaData);
   const mediaArray = useStore((state) => state.userMediaData) || [];
   const [tempMediaArray, setTempMediaArray] = useState<MediaItem[]>([]);
-  const [fullscreenMedia, setFullscreenMedia] = useState<MediaItem | null>(null);
+  const [fullscreenMedia, setFullscreenMedia] = useState<MediaItem | null>(
+    null
+  );
   const [showMedia, setShowMedia] = useState(0);
 
   // Memoize mediaArray to avoid unnecessary re-renders
@@ -47,10 +49,14 @@ const ImageUploadComponent = () => {
     if (showMedia === 0) {
       setTempMediaArray(memoizedMediaArray);
     } else if (showMedia === 1) {
-      const tempArray = memoizedMediaArray.filter((item: MediaItem) => item.mediaId.mediaType !== "video");
+      const tempArray = memoizedMediaArray.filter(
+        (item: MediaItem) => item.mediaId.mediaType !== "video"
+      );
       setTempMediaArray(tempArray);
     } else {
-      const tempArray = memoizedMediaArray.filter((item: MediaItem) => item.mediaId.mediaType === "video");
+      const tempArray = memoizedMediaArray.filter(
+        (item: MediaItem) => item.mediaId.mediaType === "video"
+      );
       setTempMediaArray(tempArray);
     }
   }, [showMedia, memoizedMediaArray]);
@@ -72,13 +78,22 @@ const ImageUploadComponent = () => {
     formData.append("file", file);
 
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/upload`, {
-        method: "POST",
-        body: formData,
-      });
-      fetchUserData(); // Ensure this fetches the updated media data
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/upload`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+      const respons = await response.json();
+      if (respons.status == 200 && respons.media) {
+        let newArray = [respons.media, ...mediaArray];
+        updateMediadata(newArray);
+      }
     } catch (error) {
-      console.error("Upload error:", error);
+      throw new Error(
+        "UnExpected Error While Uploading Your Media, Please Refresh And Do it Again"
+      );
     } finally {
       setIsUploading(false);
     }
@@ -86,16 +101,26 @@ const ImageUploadComponent = () => {
 
   const handleDelete = async (mediaId: string) => {
     try {
+      console.log(mediaArray);
+      console.log(mediaId);
       setDeletingItems((prev) => new Set(prev).add(mediaId));
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/deletemedia/${mediaId}`, {
-        method: "DELETE",
-      });
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/deletemedia/${mediaId}`,
+        {
+          method: "DELETE",
+        }
+      );
       if (response.ok) {
         console.log("Deleted successfully");
-        await fetchUserData();
+        let filteredData = mediaArray.filter(
+          (item) => item.mediaId?._id !== mediaId
+        );
+        updateMediadata(filteredData);
       }
     } catch (error) {
-      console.error("Delete error:", error);
+      throw new Error(
+        "UnExpected Error While Deleting Your Media, Please Refresh And Do it Again"
+      );
     } finally {
       setDeletingItems((prev) => {
         const newSet = new Set(prev);
@@ -107,25 +132,25 @@ const ImageUploadComponent = () => {
 
   const fetchUserData = async () => {
     try {
-      setInitialLoading(true)
+      setInitialLoading(true);
       const api = `${process.env.NEXT_PUBLIC_API_URL}/api/getuserdata`;
       const response = await fetch(api, { method: "GET" });
       const data = await response.json();
       updateMediadata(data.data?.media || []);
     } catch (error) {
       console.error("Error fetching user data:", error);
-    }finally{
-      setInitialLoading(false)
+    } finally {
+      setInitialLoading(false);
     }
   };
 
   const downloadTheMedia = async (imageUrl: string, fileName: string) => {
     try {
-      const response = await fetch(imageUrl, { mode: 'cors' });
+      const response = await fetch(imageUrl, { mode: "cors" });
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
 
-      const link = document.createElement('a');
+      const link = document.createElement("a");
       link.href = url;
       link.download = fileName;
       document.body.appendChild(link);
@@ -143,7 +168,9 @@ const ImageUploadComponent = () => {
   };
 
   useEffect(() => {
-    fetchUserData();
+    if (!mediaArray.length) {
+      fetchUserData();
+    }
   }, []);
 
   const copyId = async (id: string) => {
@@ -154,19 +181,20 @@ const ImageUploadComponent = () => {
 
   return (
     <div className="min-h-screen bg-gray-900">
-      {initialLoading ? 
+      {initialLoading ? (
         <div className="flex justify-center items-center min-h-screen">
-        <span className="loading loading-bars loading-2xl"></span>
-      </div>
-      
-      : 
+          <span className="loading loading-bars loading-2xl"></span>
+        </div>
+      ) : (
         <div className="w-full max-w-[2000px] mx-auto px-4 py-6">
           {/* Header Section with Filter */}
           <div className="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
             <h1 className="text-2xl font-bold text-white">Media Gallery</h1>
             <div className="flex items-center gap-4">
               <div className="flex flex-col gap-2">
-                <h3 className="text-lg font-semibold text-white mb-2">Filters</h3>
+                <h3 className="text-lg font-semibold text-white mb-2">
+                  Filters
+                </h3>
                 <div className="btn-group btn-group-vertical">
                   <button
                     className={`btn ${showMedia === 0 ? "btn-active" : ""}`}
@@ -225,7 +253,10 @@ const ImageUploadComponent = () => {
             {mediaArray.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {tempMediaArray.map((item: MediaItem) => (
-                  <div key={item._id} className="card bg-base-200 shadow-xl hover:shadow-2xl transition-all duration-300">
+                  <div
+                    key={item._id}
+                    className="card bg-base-200 shadow-xl hover:shadow-2xl transition-all duration-300"
+                  >
                     <figure
                       className="relative pt-[56.25%] cursor-pointer group"
                       onDoubleClick={() => handleFullscreen(item)}
@@ -233,32 +264,50 @@ const ImageUploadComponent = () => {
                       <Image
                         src={item.mediaId.originalUrl}
                         alt={item.mediaId.fileName}
-                        layout="fill"
-                        objectFit="cover"
+                        fill
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" // Example sizes for different viewports
+                        style={{ objectFit: "cover" }}
                         className="absolute top-0 left-0 w-full h-full rounded-lg"
                       />
                     </figure>
                     <div className="card-body">
-                      <h2 className="card-title text-base">{item.mediaId.fileName}</h2>
-                      <p>{item.mediaId.mediaType === "video" ? "Video" : "Image"}</p>
+                      <h2 className="card-title text-base">
+                        {item.mediaId.fileName}
+                      </h2>
+                      <p>
+                        {item.mediaId.mediaType === "video" ? "Video" : "Image"}
+                      </p>
                       <div className="card-actions justify-between">
                         <button
                           className="btn btn-sm btn-primary"
-                          onClick={() => downloadTheMedia(item.mediaId.originalUrl, item.mediaId.fileName)}
+                          onClick={() =>
+                            downloadTheMedia(
+                              item.mediaId.originalUrl,
+                              item.mediaId.fileName
+                            )
+                          }
                         >
                           Download
                         </button>
                         <button
-                          className={`btn btn-sm btn-secondary ${deletingItems.has(item._id) ? "loading" : ""}`}
+                          className={`btn btn-sm btn-secondary ${
+                            deletingItems.has(item._id) ? "loading" : ""
+                          }`}
                           onClick={() => handleDelete(item.mediaId._id)}
                         >
                           <Trash2 className="mr-2" />
                         </button>
                         <button
-                          className={`btn btn-sm ${copiedId === item._id ? "btn-active" : ""}`}
+                          className={`btn btn-sm ${
+                            copiedId === item._id ? "btn-active" : ""
+                          }`}
                           onClick={() => copyId(item.mediaId._id)}
                         >
-                          <Copy className="mr-2" />
+                          {copiedId && copiedId == item.mediaId._id ? (
+                            "Copied.."
+                          ) : (
+                            <Copy className="mr-2" />
+                          )}
                         </button>
                       </div>
                     </div>
@@ -272,11 +321,14 @@ const ImageUploadComponent = () => {
             )}
           </div>
         </div>
-      }
+      )}
       {fullscreenMedia && (
         <div className="fixed inset-0 z-50 flex justify-center items-center bg-black bg-opacity-80">
           <div className="relative">
-            <button className="absolute top-0 right-0 p-4 text-red-500 text-2xl" onClick={handleCloseFullscreen}>
+            <button
+              className="absolute top-0 right-0 p-4 text-red-500 text-2xl"
+              onClick={handleCloseFullscreen}
+            >
               X
             </button>
             <Image

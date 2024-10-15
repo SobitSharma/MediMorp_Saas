@@ -3,11 +3,14 @@
 import React, { useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import useStore from '@/Utility/Store/Store';
 
 const UploadComponent: React.FC = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [selectedPlatform, setSelectedPlatform] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const updateMediadata = useStore((state) => state.updateUserMediaData);
+  const mediaArray = useStore((state) => state.userMediaData) || [];
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
@@ -36,14 +39,16 @@ const UploadComponent: React.FC = () => {
         method: 'POST',
         body: formData,
       });
-
-      if (response.ok) {
+      const result = await response.json()
+      if(result.status==200 && result.media){
+        let temparray = [result.media, ...mediaArray]
+        updateMediadata(temparray)
         toast.success("The media has been saved in the Media section.");
-      } else {
+      }
+      else{
         throw new Error(`HTTP error! status: ${response.status}`);
       }
     } catch (err) {
-      console.log(err)
       toast.error("An error occurred while saving the media.");
     } finally {
       setIsLoading(false);

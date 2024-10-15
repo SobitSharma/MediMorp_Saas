@@ -1,11 +1,14 @@
 'use client';
 import React, { useState } from 'react';
+import useStore from '@/Utility/Store/Store';
 
 export default function TransformationCenter() {
   const [mediaId, setMediaId] = useState('');
   const [selectedOption, setSelectedOption] = useState('round-corners');
   const [isLoading, setIsLoading] = useState(false);
   const [showMessage, setShowMessage] = useState('');
+  const updateMediadata = useStore((state) => state.updateUserMediaData);
+  const mediaArray = useStore((state) => state.userMediaData) || [];
 
   const handleTransform = async() => {
     console.log(mediaId, selectedOption)
@@ -18,6 +21,11 @@ export default function TransformationCenter() {
       body:JSON.stringify({mediaId:mediaId, tranformId:selectedOption})
     });
     const result = await response.json();
+    if(result.status==200 && result.media){
+      let temparray = [result.media, ...mediaArray]
+      updateMediadata(temparray)
+    }
+
     setIsLoading(false);
     setShowMessage(result.message);
     setTimeout(() => {
