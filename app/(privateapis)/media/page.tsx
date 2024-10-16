@@ -91,7 +91,7 @@ const ImageUploadComponent = () => {
         updateMediadata(newArray);
       }
     } catch (error) {
-      console.log(error)
+      console.log(error);
       throw new Error(
         "UnExpected Error While Uploading Your Media, Please Refresh And Do it Again"
       );
@@ -102,8 +102,6 @@ const ImageUploadComponent = () => {
 
   const handleDelete = async (mediaId: string) => {
     try {
-      console.log(mediaArray);
-      console.log(mediaId);
       setDeletingItems((prev) => new Set(prev).add(mediaId));
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/deletemedia/${mediaId}`,
@@ -112,14 +110,13 @@ const ImageUploadComponent = () => {
         }
       );
       if (response.ok) {
-        console.log("Deleted successfully");
         const filteredData = mediaArray.filter(
           (item) => item.mediaId?._id !== mediaId
         );
         updateMediadata(filteredData);
       }
     } catch (error) {
-      console.log(error)
+      console.log(error);
       throw new Error(
         "UnExpected Error While Deleting Your Media, Please Refresh And Do it Again"
       );
@@ -140,7 +137,7 @@ const ImageUploadComponent = () => {
       const data = await response.json();
       updateMediadata(data.data?.media || []);
     } catch (error) {
-      console.log(error)
+      console.log(error);
       console.error("Error fetching user data:", error);
     } finally {
       setInitialLoading(false);
@@ -264,14 +261,22 @@ const ImageUploadComponent = () => {
                       className="relative pt-[56.25%] cursor-pointer group"
                       onDoubleClick={() => handleFullscreen(item)}
                     >
-                      <Image
-                        src={item.mediaId.originalUrl}
-                        alt={item.mediaId.fileName}
-                        fill
-                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" // Example sizes for different viewports
-                        style={{ objectFit: "cover" }}
-                        className="absolute top-0 left-0 w-full h-full rounded-lg"
-                      />
+                      {item.mediaId?.mediaType === "image" ? (
+                        <Image
+                          src={item.mediaId.originalUrl}
+                          alt={item.mediaId.fileName}
+                          fill
+                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                          style={{ objectFit: "cover" }}
+                          className="absolute top-0 left-0 w-full h-full rounded-lg"
+                        />
+                      ) : (
+                        <video
+                          src={item.mediaId.originalUrl}
+                          controls
+                          className="absolute top-0 left-0 w-full h-full rounded-lg object-cover"
+                        />
+                      )}
                     </figure>
                     <div className="card-body">
                       <h2 className="card-title text-base">
@@ -306,7 +311,7 @@ const ImageUploadComponent = () => {
                           }`}
                           onClick={() => copyId(item.mediaId._id)}
                         >
-                          {copiedId && copiedId == item.mediaId._id ? (
+                          {copiedId && copiedId === item.mediaId._id ? (
                             "Copied.."
                           ) : (
                             <Copy className="mr-2" />
@@ -327,22 +332,23 @@ const ImageUploadComponent = () => {
       )}
       {fullscreenMedia && (
         <div className="fixed inset-0 z-50 flex justify-center items-center bg-black bg-opacity-80">
-          <div className="relative">
-            <button
-              className="absolute top-0 right-0 p-4 text-red-500 text-2xl"
-              onClick={handleCloseFullscreen}
-            >
-              X
-            </button>
-            <Image
-              src={fullscreenMedia.mediaId.originalUrl}
-              alt={fullscreenMedia.mediaId.fileName}
-              width={fullscreenMedia.mediaId.dimensions?.width || 800}
-              height={fullscreenMedia.mediaId.dimensions?.height || 600}
-              className="rounded-lg"
-            />
-          </div>
+        <div className="relative">
+          <button
+            className="absolute top-0 right-0 p-4 text-red-500 text-2xl"
+            onClick={handleCloseFullscreen}
+          >
+            X
+          </button>
+          <Image
+            src={fullscreenMedia.mediaId.originalUrl}
+            alt={fullscreenMedia.mediaId.fileName}
+            width={fullscreenMedia.mediaId.dimensions?.width || 800}
+            height={fullscreenMedia.mediaId.dimensions?.height || 600}
+            className="rounded-lg max-w-[90vw] max-h-[90vh] object-contain"
+          />
         </div>
+      </div>
+      
       )}
     </div>
   );
