@@ -3,7 +3,7 @@ import { Image as LucideImage, Share, Camera, UserCircle, Settings } from 'lucid
 import { currentUser } from '@clerk/nextjs/server';
 import Link from 'next/link';
 import { SignOutButton } from '@clerk/nextjs';
-import Image from 'next/image'; // Import the Image component from Next.js
+import Image from 'next/image'; 
 
 const AppLayout = async ({ children }: { children: ReactNode }) => {
     const user = await currentUser();

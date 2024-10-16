@@ -4,56 +4,37 @@ import { FileDown, Wand2, Share, Clock, CloudLightning } from "lucide-react";
 import Link from "next/link";
 import { useUser } from "@clerk/nextjs";
 import useStore from "@/Utility/Store/Store";
+import {useRouter} from "next/navigation"
 
 const HomePage: React.FC = () => {
-  const { isLoaded, user } = useUser();
-  const updateUserId = useStore((state) => state.updateUserId);
-  const isUserLoggedIn = useStore((state) => state.isUserLoggedIn);
-  const updateUserLoggedInStatus = useStore((state) => state.updateUserLoggedInStatus);
-  const savedUserId = useStore((state) => state.userId);
-  
-  // Track if the API has been called
-  const [apiCalled, setApiCalled] = useState<boolean>(false);
+  const {isSignedIn} = useUser()
+  const router = useRouter()
+  const {isUserLoggedIn,updateUserLoggedInStatus } = useStore()
 
-  useEffect(() => {
-    // Check local storage on mount to update user logged in status
-    const getItem = localStorage.getItem(`${process.env.SAAS_PLATFORM_USER}`);
-    if (getItem) {
-      updateUserLoggedInStatus();
+  const storingUser = async() => {
+    if(!isSignedIn){
+      router.push('/home')
     }
-  }, [updateUserLoggedInStatus]);
-
-  useEffect(() => {
-    const saveUserData = async () => {
-      if (!isLoaded || isUserLoggedIn || apiCalled) return; // Add apiCalled check here
-
-      const userId = user?.id;
-      if (userId && !savedUserId) {
-        updateUserId(userId);
+    else{
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/savinguser`, {
+        method:'GET'
+      })
+      const result = await response.json()
+      if(result.status == 200){
+        updateUserLoggedInStatus(true)
       }
-
-      try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/savinguser`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ userId }),
-        });
-        if (response.ok) {
-          localStorage.setItem(`${process.env.SAAS_PLATFORM_USER}`, "true");
-          updateUserLoggedInStatus();
-          setApiCalled(true); // Set apiCalled to true after successful call
-        }
-      } catch (error) {
-        console.log("error",error)
-        throw new Error("Some Problem Occurred While Saving User, Please Click Below Refresh")
+      else{
+        router.push('/home')
       }
-    };
+    }
+  }
 
-    saveUserData();
-  }, [isLoaded, isUserLoggedIn, updateUserId, updateUserLoggedInStatus, user?.id, savedUserId, apiCalled]);
-
+  useEffect(()=>{
+    if(!isUserLoggedIn){
+      storingUser()
+    }
+  }, [])
+  
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="hero bg-base-200 rounded-lg mb-8 p-8">
