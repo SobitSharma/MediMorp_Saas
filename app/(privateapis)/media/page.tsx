@@ -255,7 +255,7 @@ const ImageUploadComponent = () => {
           <div className="w-full min-h-[800px]">
             {mediaArray.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {tempMediaArray.map((item: MediaItem) => (
+                {tempMediaArray?.map((item: MediaItem) => (
                   <div
                     key={item._id}
                     className="card bg-base-200 shadow-xl hover:shadow-2xl transition-all duration-300"
