@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect} from "react";
 import { FileDown, Wand2, Share, Clock, CloudLightning } from "lucide-react";
 import Link from "next/link";
 import { useUser } from "@clerk/nextjs";
